@@ -1,8 +1,7 @@
-# SpringBoot 项目初始模板
+# SpringBoot 后端项目初始模板
 
-> by [程序员鱼皮知识星球](https://yupi.icu)
 
-Java SpringBoot 项目初始模板，整合了常用框架和示例代码，大家可以在此基础上快速开发自己的项目。
+Java SpringBoot 项目初始模板，整合了常用框架和示例代码，可以在此基础上快速开发自己的项目。
 
 ## 模板功能
 
