@@ -58,7 +58,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String sign = headers.getFirst("sign");
         String body = headers.getFirst("body");
         // todo 实际情况应该去数据库查是否分配给用户
-        if(!accessKey.equals("yupi")){
+        if(!"yupi".equals(accessKey)){
             return handleNoAuth(response);
         }
         if(Long.parseLong(nonce) > 10000L){
@@ -91,7 +91,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
      * @param chain
      * @return
      */
-    public Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain, long interfaceInfoId, long userId) {
+//    public Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain, long interfaceInfoId, long userId) {
+    public Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain) {
         try {
             ServerHttpResponse originalResponse = exchange.getResponse();
             // 缓存数据的工厂
