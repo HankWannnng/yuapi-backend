@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 public class UserInterfaceInfoServiceTest {
 
     @Resource
-    private  UserInterfaceInfoService userInterfaceInfoService;
+    private UserInterfaceInfoService userInterfaceInfoService;
     @Test
     public void invokeCount() {
         boolean b = userInterfaceInfoService.invokeCount(1L, 1L);
