@@ -30,4 +30,17 @@ public interface UserConstant {
     String ADMIN_ROLE = "admin";
 
     // endregion
+
+    /**
+     * 默认分配接口次数
+     *
+     */
+
+    int INTERFACE_COUNT = 10;
+
+
+    /**
+     * 盐值，混淆密码
+     */
+    String SALT = "yupi";
 }

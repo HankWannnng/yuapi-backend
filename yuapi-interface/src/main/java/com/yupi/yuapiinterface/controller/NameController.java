@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/name")
+//@CrossOrigin(origins = {"http://47.113.188.36"}, allowCredentials = "true")
 public class NameController {
 
     @GetMapping("/get")

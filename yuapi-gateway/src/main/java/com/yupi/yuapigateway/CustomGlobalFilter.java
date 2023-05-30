@@ -46,7 +46,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     private static final List<String> IP_WHITE_LIST = Arrays.asList("127.0.0.1");
 
 
-    private static final String INTERFACE_HOST = "http://localhost:8123";
+    private static final String INTERFACE_HOST = "http://47.113.188.36:8123";
+//    private static final String INTERFACE_HOST = "http://localhost:8123";
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1 请求日志
@@ -62,10 +63,10 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         log.info("请求来源地址：" + request.getRemoteAddress());
         ServerHttpResponse response = exchange.getResponse();
         // 2. 访问控制 - 黑白名单
-        if (!IP_WHITE_LIST.contains(sourceAddress)) {
-            response.setStatusCode(HttpStatus.FORBIDDEN);
-            return response.setComplete();
-        }
+//        if (!IP_WHITE_LIST.contains(sourceAddress)) {
+//            response.setStatusCode(HttpStatus.FORBIDDEN);
+//            return response.setComplete();
+//        }
 
         // 3. 用户鉴权（判断 ak、sk 是否合法）
         HttpHeaders headers = request.getHeaders();
@@ -77,32 +78,37 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         // todo 实际情况应该去数据库查是否分配给用户
         User invokeUser = null;
         try {
+            log.info(accessKey);
             invokeUser = innerUserService.getInvokeUser(accessKey);
 
         }catch (Exception e){
             log.error("getINvokeUser error", e);
         }
+        log.info("dddddddddddddddddd");
         if(invokeUser == null){
             return handleNoAuth(response);
         }
 //        if(!"yupi".equals(accessKey)){
 //            return handleNoAuth(response);
 //        }
-        if(Long.parseLong(nonce) > 10000L){
-            return handleNoAuth(response);
-        }
+//        if(Long.parseLong(nonce) > 10000L){
+//            return handleNoAuth(response);
+//        }
         // 时间和当前时间不能超过 5 分钟
-        Long currentTime = System.currentTimeMillis() / 1000;
-        final Long FIVE_MINUTES = 60 * 5L;
-        if ((currentTime - Long.parseLong(timestamp)) >= FIVE_MINUTES) {
-            return handleNoAuth(response);
-        }
+//        Long currentTime = System.currentTimeMillis() / 1000;
+//        final Long FIVE_MINUTES = 60 * 5L;
+//        if ((currentTime - Long.parseLong(timestamp)) >= FIVE_MINUTES) {
+//            log.info("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+//            return handleNoAuth(response);
+//        }
         // 实际情况是根据请求头中的accesskey从数据库去取出的secretKey
+        log.info("aaaaaaaaaaaaaaaaa");
         String secretKey = invokeUser.getSecretKey();
         String serverSign = SignUtil.genSign(body, secretKey);
         if(sign == null || !sign.equals(serverSign)){
             return handleNoAuth(response);
         }
+        log.info("bbbbbbbbbbbbbbbbbbbb");
         // 4. 请求的模拟接口是否存在，以及请求方法是否匹配
         InterfaceInfo interfaceInfo = null;
         try {
@@ -114,9 +120,21 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             return handleNoAuth(response);
         }
         // todo 是否还有调用次数
-        // 5. 请求转发，调用模拟接口 + 响应日志
-        //        Mono<Void> filter = chain.filter(exchange);
-        //        return filter;
+
+        log.info("cccccccccccccccccccccccc");
+        Boolean b = false;
+        try {
+            b = innerUserInterfaceInfoService.checkCount(interfaceInfo.getId(), invokeUser.getId());
+        }catch (Exception e){
+            log.error("getINvokeUser error", e);
+        }
+        if(!b){
+        return handleNoAuth(response);
+    }
+
+    // 5. 请求转发，调用模拟接口 + 响应日志
+    //        Mono<Void> filter = chain.filter(exchange);
+    //        return filter;
         return handleResponse(exchange, chain, interfaceInfo.getId(), invokeUser.getId());
 
     }

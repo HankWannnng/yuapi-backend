@@ -25,4 +25,13 @@
         select interfaceInfoId, sum(totalNum) as totalNum from user_interface_info group by interfaceInfoId
         order by totalNum desc limit #{limit};
     </select>
+
+    <update id="buyInterface">
+        update user_interface_info set leftNum = leftNum + #{count} where userId = #{userId} and interfaceInfoId = #{interfaceId};
+    </update>
+
+    <insert id="interfaceCount">
+        INSERT INTO user_interface_info (userId,interfaceInfoId,totalNum,leftNum)VALUES (#{userId},#{interfaceId},0,#{count});
+    </insert>
+
 </mapper>

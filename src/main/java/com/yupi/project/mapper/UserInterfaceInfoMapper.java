@@ -14,6 +14,22 @@ import java.util.List;
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
 
     List<UserInterfaceInfo> listTopInvokeInterfaceInfo(int limit);
+
+    /**
+     * 购买次数
+     * @param userId
+     * @param interfaceId
+     * @param count
+     * @return
+     */
+    int buyInterface(Long userId, Long interfaceId, int count);
+
+    /**
+     * 默认分配10次调用
+     * @param count
+     * @return
+     */
+    boolean interfaceCount(int count, long userId, int interfaceId);
 }
 
 

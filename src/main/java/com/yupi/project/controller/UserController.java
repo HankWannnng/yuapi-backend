@@ -1,17 +1,20 @@
 package com.yupi.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.yupi.project.common.BaseResponse;
-import com.yupi.project.common.DeleteRequest;
-import com.yupi.project.common.ErrorCode;
-import com.yupi.project.common.ResultUtils;
+import com.yupi.project.common.*;
 import com.yupi.project.exception.BusinessException;
+import com.yupi.project.mapper.UserInterfaceInfoMapper;
 import com.yupi.project.model.dto.user.*;
+import com.yupi.project.model.dto.userinterfaceinfo.BuyInterfaceRequest;
 import com.yupi.project.model.vo.UserVO;
+import com.yupi.project.service.UserInterfaceInfoService;
 import com.yupi.project.service.UserService;
+import com.yupi.project.utils.UserHolder;
 import com.yupi.yuapicommon.model.entity.User;
+import com.yupi.yuapicommon.model.entity.UserInterfaceInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.yupi.project.constant.UserConstant.INTERFACE_COUNT;
 
 /**
  * 用户接口
@@ -32,6 +37,13 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+
+    @Resource
+    private UserInterfaceInfoMapper userInterfaceInfoMapper;
+
+    @Resource
+    private UserInterfaceInfoService userInterfaceInfoService;
 
     // region 登录相关
 
@@ -53,6 +65,9 @@ public class UserController {
             return null;
         }
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        if(result > 0){
+            userInterfaceInfoMapper.interfaceCount(INTERFACE_COUNT, result, 6);
+        }
         return ResultUtils.success(result);
     }
 
@@ -236,4 +251,61 @@ public class UserController {
     }
 
     // endregion
+
+
+    /**
+     * 购买接口
+     *
+     * @param buyInterfaceRequest
+     * @param request
+     * @return
+     */
+
+    @PostMapping("/buy/interface")
+    public BaseResponse<String> buyInterface(BuyInterfaceRequest buyInterfaceRequest, HttpServletRequest request) {
+
+        if (buyInterfaceRequest == null || request == null) {
+
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "此接口不存在！");
+        }
+
+        Long interfaceInfoId = buyInterfaceRequest.getId();
+
+//        String loginUser= UserHolder.getUser();
+//        long userId = Long.parseLong(loginUser.getId());
+
+        User loginUser = userService.getLoginUser(request);
+        long userId = loginUser.getId();
+
+        QueryWrapper<UserInterfaceInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId).eq("interfaceInfoId", interfaceInfoId);
+        Long selectCount = userInterfaceInfoMapper.selectCount(queryWrapper);
+        if (selectCount <= 0){
+            UserInterfaceInfo userInterfaceInfo = new UserInterfaceInfo();
+            userInterfaceInfo.setUserId(userId);
+            userInterfaceInfo.setInterfaceInfoId(interfaceInfoId);
+            userInterfaceInfo.setLeftNum(INTERFACE_COUNT);
+            userInterfaceInfoService.save(userInterfaceInfo);
+            return ResultUtils.success("购买成功嘞！！！！");
+        }
+        int anInterface = userInterfaceInfoMapper.buyInterface(userId, interfaceInfoId, INTERFACE_COUNT);
+        if (anInterface < 0 ){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "购买失败喽！！！");
+        }
+        return ResultUtils.success("购买成功嘞 " + INTERFACE_COUNT + "次!!!!!");
+
+
+
+//        UpdateWrapper<UserInterfaceInfo> updateWrapper = new UpdateWrapper<>();
+//        updateWrapper.eq("interfaceInfoId", interfaceInfoId);
+//        updateWrapper.eq("userId", userId);
+//        updateWrapper.setSql("leftNum = leftNum + 10");
+//        boolean anInterface = userInterfaceInfoService.update(updateWrapper);
+//        if (!anInterface) {
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "购买失败喽！！！");
+//        }
+//        return ResultUtils.success("成功购买 " + INTERFACE_COUNT + "次!!!!!");
+
+
+    }
 }

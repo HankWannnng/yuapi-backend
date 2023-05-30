@@ -18,7 +18,8 @@ import static com.yupi.yuapiclientsdk.utils.SignUtil.genSign;
  * @author jackyrwj
  */
 public class YuApiClient {
-    public static final String GETEWAY_HOST = "http://localhost:8090";
+    public static final String GETEWAY_HOST = "http://47.113.188.36:8090";
+//    public static final String GETEWAY_HOST = "http://localhost:8090";
     private String accessKey;
     private String secretKey;
 

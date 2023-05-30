@@ -16,11 +16,14 @@ import com.yupi.project.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.yupi.project.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
 import com.yupi.project.model.enums.InterfaceInfoStatusEnum;
+import com.yupi.project.model.vo.InterfaceInfoVO;
 import com.yupi.project.service.InterfaceInfoService;
+import com.yupi.project.service.UserInterfaceInfoService;
 import com.yupi.project.service.UserService;
 import com.yupi.yuapiclientsdk.client.YuApiClient;
 import com.yupi.yuapicommon.model.entity.InterfaceInfo;
 import com.yupi.yuapicommon.model.entity.User;
+import com.yupi.yuapicommon.model.entity.UserInterfaceInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +50,10 @@ public class InterfaceInfoController {
     private UserService userService;
     @Resource
     private YuApiClient yuApiClient;
+
+
+    @Resource
+    private UserInterfaceInfoService userInterfaceInfoService;
 
     // region 增删改查
 
@@ -142,12 +149,31 @@ public class InterfaceInfoController {
      * @return
      */
     @GetMapping("/get")
-    public BaseResponse<InterfaceInfo> getInterfaceInfoById(long id) {
+    public BaseResponse<InterfaceInfo> getInterfaceInfoById(long id, HttpServletRequest request) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = interfaceInfoService.getById(id);
-        return ResultUtils.success(interfaceInfo);
+//        return ResultUtils.success(interfaceInfo);
+
+        User loginUser = userService.getLoginUser(request);
+        Long userId = loginUser.getId();
+        QueryWrapper<UserInterfaceInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId)
+                .eq("interfaceInfoId", id);
+
+        UserInterfaceInfo userInterfaceInfo = userInterfaceInfoService.getOne(queryWrapper);
+        Integer totalNum = userInterfaceInfo.getTotalNum();
+        Integer leftNum = userInterfaceInfo.getLeftNum();
+
+        InterfaceInfoVO interfaceInfoVO = new InterfaceInfoVO();
+        BeanUtils.copyProperties(interfaceInfo, interfaceInfoVO);
+        interfaceInfoVO.setTotalNum(totalNum);
+        interfaceInfoVO.setLeftNum(leftNum);
+
+
+
+        return ResultUtils.success(interfaceInfoVO);
     }
 
     /**
@@ -224,11 +250,14 @@ public class InterfaceInfoController {
         }
         // 判断该接口是否可以调用
         com.yupi.yuapiclientsdk.model.User user = new com.yupi.yuapiclientsdk.model.User();
+        log.info("aaaaaaaaaaaaaaa");
         user.setUsername("test");
         String username = yuApiClient.getUsernameByPost(user);
         if (StringUtils.isBlank(username)) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
         }
+
+        log.info("bbbbbbbbbbbbbbbb");
         // 仅本人或管理员可修改
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setId(id);
@@ -236,6 +265,8 @@ public class InterfaceInfoController {
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
     }
+
+
 
     /**
      * 下线
@@ -264,7 +295,6 @@ public class InterfaceInfoController {
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
     }
-
 
     /**
      * 测试调用
@@ -297,6 +327,7 @@ public class InterfaceInfoController {
         com.yupi.yuapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.yupi.yuapiclientsdk.model.User.class);
         String usernameByPost = tempClient.getUsernameByPost(user);
         return ResultUtils.success(usernameByPost);
+
     }
 
 }

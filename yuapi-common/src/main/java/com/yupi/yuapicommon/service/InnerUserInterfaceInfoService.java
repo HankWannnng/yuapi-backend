@@ -11,4 +11,13 @@ import com.yupi.yuapicommon.model.entity.UserInterfaceInfo;
 public interface InnerUserInterfaceInfoService   {
 
     boolean invokeCount(long interfaceInfoId, long userId);
+
+    /**
+     *校验是否还有调用次数
+     *
+     * @param interfaceInfoId
+     * @param userId
+     * @return
+     */
+    boolean checkCount(long interfaceInfoId, long userId);
 }
