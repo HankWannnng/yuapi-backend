@@ -71,7 +71,7 @@ rwj接口调用平台是一个API开放调用平台，该平台的目的是为�
 
 ## 系统架构
 
-![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230605204129.png)
+![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230605210325.png)
 
 ## 项目展示
 
@@ -112,9 +112,9 @@ rwj接口调用平台是一个API开放调用平台，该平台的目的是为�
 
 2. 启动Nacos、Mysql以及各项服务
 服务启动顺序参考：
-1. yuapi-backend
-2. yuapi-interface
-5. yuapi-gateway
+   1. yuapi-backend
+   2. yuapi-interface
+   3. yuapi-gateway
 
 ## Todo
 * 实现单点登录，分布式session
