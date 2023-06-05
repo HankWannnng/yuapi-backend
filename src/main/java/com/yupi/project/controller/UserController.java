@@ -292,7 +292,7 @@ public class UserController {
         if (anInterface < 0 ){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "购买失败喽！！！");
         }
-        return ResultUtils.success("购买成功嘞 " + INTERFACE_COUNT + "次!!!!!");
+        return ResultUtils.success("购买成功嘞 " + INTERFACE_COUNT + "次!!!!!" + "返回\"我的\"可查看");
 
 
 
