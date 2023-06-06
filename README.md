@@ -76,8 +76,8 @@
 ## 项目展示
 
 * 登陆/注册
-  ![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230605194134.png)
-  ![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230605194144.png)
+  ![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230606103401.png)
+  ![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230606103406.png)
 
 * 主页
   ![](https://raw.githubusercontent.com/jackyrwj/picb/master/20230605194007.png)
