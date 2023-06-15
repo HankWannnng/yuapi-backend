@@ -40,7 +40,6 @@
 * 主语言：Java
 * 框架：SpringBoot 2.7.0、Mybatis-plus、Spring Cloud
 * 数据库：Mysql8.0、Redis
-* 中间件：RabbitMq
 * 注册中心：Nacos
 * 服务调用：Dubbo
 * 网关：Spring Cloud  Gateway
